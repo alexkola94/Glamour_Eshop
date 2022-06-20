@@ -155,8 +155,7 @@ btn_buy.addEventListener("click", function () {
       `Thank you for your purchase🥳! you have been charged ${discount()} $`
     );
   }
-   document.querySelector(".sum_price").innerHTML = `0$`;
-  document.querySelector(".item_quantity").innerHTML = `Quantity: 0`;
+   
 
   console.log(`YOU ${quantity} BUYED ITEMS`);
 });
