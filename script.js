@@ -160,5 +160,5 @@ btn_buy.addEventListener("click", function () {
   document.querySelector(".item_quantity").innerHTML = `Quantity: 0`;
 
   console.log(`YOU ${quantity} BUYED ITEMS`);
-  
+  location.reload();
 });
