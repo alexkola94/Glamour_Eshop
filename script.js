@@ -1,163 +1,204 @@
-"use strict";
+(function () {
+  // Functions
+  function buildQuiz() {
+    // variable to store the HTML output
+    const output = [];
 
-// get button elements from the DOM
-const btn_add_shoes = document.querySelector(".add_item_shoes");
-const btn_add_shirts = document.querySelector(".add_item_shirts");
-const btn_add_pants = document.querySelector(".add_item_pants");
+    // for each question...
+    myQuestions.forEach((currentQuestion, questionNumber) => {
+      // variable to store the list of possible answers
+      const answers = [];
 
-const btn_rm_shoes = document.querySelector(".remove_shoes");
-const btn_rm_shirts = document.querySelector(".remove_shirts");
-const btn_rm_pants = document.querySelector(".remove_pants");
-const btn_buy = document.querySelector(".buy_cartItems");
+      // and for each available answer...
+      for (letter in currentQuestion.answers) {
+        // ...add an HTML radio button
+        answers.push(
+          `<label>
+                <input type="radio" name="question${questionNumber}" value="${letter}">
+                ${letter} :
+                ${currentQuestion.answers[letter]}
+              </label>`
+        );
+      }
 
-const item_quantity = document.querySelector(".item_quantity");
+      // add this question and its answers to the output
+      output.push(
+        `<div class="slide">
+              <div class="question"> ${currentQuestion.question} </div>
+              <div class="answers"> ${answers.join("")} </div>
+            </div>`
+      );
+    });
 
-const total_price = document.querySelector(".sum_price");
-
-//Object for the items in the cart
-const shoes = {
-  name: "Air Max",
-  price: 100,
-  quantity: 0,
-};
-
-const shirts = {
-  name: "Lob",
-  price: 50,
-  quantity: 0,
-};
-const pants = {
-  name: "HxA",
-  price: 70,
-  quantity: 0,
-};
-
-let sum = 0;
-let quantity = 0;
-
-//alert discount function
-function alert_discount() {
-  alert_discount = function () {};
-
-  if (sum >= 100) {
-    alert("You got a 10% discount!");
-  }
-}
-//Discount function for the sum_price
-function discount() {
-  if (sum >= 100) return sum * 0.9;
-  else return (sum = sum);
-}
-
-//when clicked 'add_item' add the target object 'price' to sum and display the 'total_price' to the dom
-btn_add_shoes.addEventListener("click", function () {
-  //when clicked 'add_item' add the target object 'quantity' to the target object 'quantity' and display the 'item_quantity' to the dom
-  shoes.quantity++;
-  quantity++;
-  document.querySelector(".item_quantity").innerHTML = `Quantity:${quantity}`;
-
-  shoes.price = 0;
-  shoes.price = 100 * shoes.quantity;
-  sum = sum + 100;
-
-  document.querySelector(".sum_price").innerHTML = `${sum}$`;
-
-  document.querySelector(".sum_price").innerHTML = `${discount()}$`;
-
-  alert_discount();
-});
-
-//push the obgect property 'price' of the object 'shirts' to the array 'cart' and display the total price of the cart in the DOM
-btn_add_shirts.addEventListener("click", function () {
-  shirts.quantity++;
-  quantity++;
-  document.querySelector(".item_quantity").innerHTML = `Quantity:${quantity}`;
-
-  shirts.price = 0;
-  shirts.price = 50 * shirts.quantity;
-  sum = sum + 50;
-
-  document.querySelector(".sum_price").innerHTML = `${sum}$`;
-  document.querySelector(".sum_price").innerHTML = `${discount()}$`;
-
-  alert_discount();
-});
-//push the obgect property 'price' of the object 'pants' to the array 'cart' and display the total price of the cart in the DOM
-btn_add_pants.addEventListener("click", function () {
-  pants.quantity++;
-  quantity++;
-  document.querySelector(".item_quantity").innerHTML = `Quantity:${quantity}`;
-
-  pants.price = 0;
-  pants.price = 70 * pants.quantity;
-  sum = sum + 70;
-
-  document.querySelector(".sum_price").innerHTML = `${sum}$`;
-  document.querySelector(".sum_price").innerHTML = `${discount()}$`;
-  alert_discount();
-});
-
-//when 'btn_rm_shoes' is clicked subtract from the sum the object 'price' of the target object and display the 'total_price' in the DOM
-
-btn_rm_shoes.addEventListener("click", function () {
-  if (shoes.quantity > 0) {
-    shoes.quantity--;
-    quantity--;
-    shoes.price = 0;
-    shoes.price = 100 * shoes.quantity;
-    sum = sum - 100;
+    // finally combine our output list into one string of HTML and put it on the page
+    quizContainer.innerHTML = output.join("");
   }
 
-  document.querySelector(".item_quantity").innerHTML = `Quantity: ${quantity}`;
+  function showResults() {
+    // gather answer containers from our quiz
+    const answerContainers = quizContainer.querySelectorAll(".answers");
 
-  document.querySelector(".sum_price").innerHTML = `${sum}$`;
-  document.querySelector(".sum_price").innerHTML = `${discount()}$`;
+    // keep track of user's answers
+    let numCorrect = 0;
 
-  alert_discount();
-});
+    // for each question...
+    myQuestions.forEach((currentQuestion, questionNumber) => {
+      // find selected answer
+      const answerContainer = answerContainers[questionNumber];
+      const selector = `input[name=question${questionNumber}]:checked`;
+      const userAnswer = (answerContainer.querySelector(selector) || {}).value;
 
-//when 'btn_rm_shirts' is clicked subtract from the sum the object 'price' of the target object and display the 'total_price' in the DOM
-btn_rm_shirts.addEventListener("click", function () {
-  if (shirts.quantity > 0) {
-    shirts.quantity--;
-    quantity--;
-    shirts.price = 0;
-    shirts.price = 50 * shoes.quantity;
-    sum = sum - 50;
+      // if answer is correct
+      if (userAnswer === currentQuestion.correctAnswer) {
+        // add to the number of correct answers
+        numCorrect++;
+
+        // color the answers green
+        answerContainers[questionNumber].style.color = "lightgreen";
+      }
+      // if answer is wrong or blank
+      else {
+        // color the answers red
+        answerContainers[questionNumber].style.color = "red";
+      }
+    });
+
+    // show number of correct answers out of total
+    resultsContainer.innerHTML = `You got ${numCorrect} out of ${myQuestions.length} !`;
   }
-  document.querySelector(".item_quantity").innerHTML = `Quantity:${quantity}`;
-
-  document.querySelector(".sum_price").innerHTML = `${sum}$`;
-  document.querySelector(".sum_price").innerHTML = `${discount()}$`;
-});
-
-//when 'btn_rm_pants' is clicked subtract from the sum the object 'price' of the target object and display the 'total_price' in the DOM
-btn_rm_pants.addEventListener("click", function () {
-  if (pants.quantity > 0) {
-    pants.quantity--;
-    quantity--;
-    pants.price = 0;
-    pants.price = 70 * shoes.quantity;
-    sum = sum - 70;
+  //A function for displaying the slides to the dom
+  function showSlide(n) {
+    slides[currentSlide].classList.remove("active-slide");
+    slides[n].classList.add("active-slide");
+    currentSlide = n;
+    if (currentSlide === 0) {
+      previousButton.style.display = "none";
+    } else {
+      previousButton.style.display = "inline-block";
+    }
+    if (currentSlide === slides.length - 1) {
+      nextButton.style.display = "none";
+      submitButton.style.display = "inline-block";
+    } else {
+      nextButton.style.display = "inline-block";
+      submitButton.style.display = "none";
+    }
   }
-  document.querySelector(".item_quantity").innerHTML = `Quantity:${quantity}`;
 
-  document.querySelector(".sum_price").innerHTML = `${sum}$`;
-  document.querySelector(".sum_price").innerHTML = `${discount()}$`;
-});
-
-//when 'btn_buy' is clicked alert the total price of the cart
-btn_buy.addEventListener("click", function () {
-  if (sum === 0) {
-    alert("Your cart is empty 😑");
-  } else {
-    alert(
-      `Thank you for your purchase🥳! you have been charged ${discount()} $`
-    );
+  function showNextSlide() {
+    showSlide(currentSlide + 1);
   }
-   
 
-  console.log(`YOU ${quantity} BUYED ITEMS`);
-});
+  function showPreviousSlide() {
+    showSlide(currentSlide - 1);
+  }
 
+  // Variables
+  const quizContainer = document.getElementById("quiz");
+  const resultsContainer = document.getElementById("results");
+  const submitButton = document.getElementById("submit");
+  const myQuestions = [
+    {
+      question: "Who is the starring actor in the Tv-Series 'Game of Thrones'?",
+      answers: {
+        a: "Kit Harington",
+        b: "Emilia Clarke",
+        c: "Peter Dinklage",
+      },
+      correctAnswer: "a",
+    },
+    {
+      question:
+        "Which of the following characters is most loved by fans of the Walking Dead?",
+      answers: {
+        a: "Daryl Dixon",
+        b: "Rick Grimes",
+        c: "Negan",
+      },
+      correctAnswer: "a",
+    },
+    {
+      question: "Which year was the first episode of Friends aired?",
+      answers: {
+        a: "1994",
+        b: "2001",
+        c: "1991",
+        d: "1999",
+      },
+      correctAnswer: "a",
+    },
+    {
+      question: "What was the best soundtrack of Attack on Titans?",
+      answers: {
+        a: "Rumbling",
+        b: "Red Swan",
+        c: "Great Escape",
+        d: "Jiyuu No Tsubasa",
+      },
+      correctAnswer: "b",
+    },
+    {
+      question: "Who was Chuck at 'Supernatural'?",
+      answers: {
+        a: "Samara",
+        b: "Lucifer",
+        c: "Prophet",
+        d: "God",
+      },
+      correctAnswer: "d",
+    },
+    {
+      question: "Where was the prison that Jim was in , on 'Stranger things'?",
+      answers: {
+        a: "Germany",
+        b: "Russia",
+        c: "Lithuania",
+        d: "Alaska",
+      },
+      correctAnswer: "b",
+    },
+    {
+      question: "How Ragnar Lothbrok was killed in 'Vigings'?",
+      answers: {
+        a: "In battle",
+        b: "By a bear",
+        c: "By his Sons",
+        d: "Snake Pit",
+      },
+      correctAnswer: "d",
+    },
+    {
+      question:
+        "Did Penny wanted to have a kid with Leonard on 'The Big Bang Theory'?",
+      answers: {
+        a: "No",
+        b: "Yes",
+        c: "Maybe",
+        d: "They didn't mention it",
+      },
+      correctAnswer: "a",
+    },
+  ];
 
+  // Kick things off
+  buildQuiz();
+
+  // Pagination
+  const previousButton = document.getElementById("previous");
+  const nextButton = document.getElementById("next");
+  const slides = document.querySelectorAll(".slide");
+  const restart_game = document.querySelector(".restart");
+
+  let currentSlide = 0;
+
+  // Show the first slide
+  showSlide(currentSlide);
+
+  // Event listeners
+  submitButton.addEventListener("click", showResults);
+  previousButton.addEventListener("click", showPreviousSlide);
+  nextButton.addEventListener("click", showNextSlide);
+  restart_game.addEventListener("click", function () {
+    location.reload();
+  });
+})();
